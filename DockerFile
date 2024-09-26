@@ -1,0 +1,32 @@
+# Use the official Python image from the Docker Hub
+FROM python:3.9-slim
+
+# Set environment variables to prevent Python from buffering stdout/stderr
+ENV PYTHONUNBUFFERED=1
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install TensorFlow, Flask, and other dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the port that the Flask app runs on
+EXPOSE 5000
+
+# Set environment variable to ensure Flask runs on the correct host
+ENV FLASK_RUN_HOST=0.0.0.0
+
+# Command to run the Flask app
+CMD ["flask", "run"]
